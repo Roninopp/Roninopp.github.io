@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ronin — Vibe Coder & Prompt Engineer</title>
+<meta name="description" content="Ronin builds Telegram bots, trading analysis tools and media downloaders with Python, yt-dlp and ffmpeg.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0d1230; --indigo:#1a2358; --moon:#eef0fa; --steel:#9aa6d6; --sakura:#ff9ab8; --line:rgba(154,166,214,.22);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Manrope',system-ui,sans-serif;color:var(--moon);line-height:1.65;
+  background:radial-gradient(1200px 700px at 80% -10%,var(--indigo),transparent 60%),var(--night);
+  min-height:100vh;overflow-x:hidden;
+}
+canvas#petals{position:fixed;inset:0;z-index:0;pointer-events:none}
+main,header,footer{position:relative;z-index:1}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--sakura);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+.logo{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:1.3rem;text-decoration:none;letter-spacing:.02em}
+.logo span{color:var(--sakura)}
+nav ul{display:flex;gap:22px;list-style:none;padding:0}
+nav ul a{text-decoration:none;color:var(--steel);font-size:.95rem;transition:color .2s}
+nav ul a:hover{color:var(--moon)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;padding:56px 0 90px}
+h1{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:clamp(2.6rem,6.5vw,4.8rem);line-height:1.05;letter-spacing:-.01em}
+.hero p.lead{margin-top:22px;max-width:46ch;color:var(--steel);font-size:1.1rem}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-block;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;border:1px solid var(--line);transition:transform .2s,background .2s,border-color .2s}
+.btn.primary{background:var(--sakura);color:#2a0f1a;border-color:var(--sakura)}
+.btn:hover{transform:translateY(-2px);border-color:var(--sakura)}
+.hanko{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:8px;background:var(--sakura);color:#2a0f1a;font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:1.5rem;transform:rotate(-6deg);margin-bottom:22px;animation:stamp .7s cubic-bezier(.2,1.4,.4,1) .2s both}
+@keyframes stamp{from{transform:rotate(-30deg) scale(2.2);opacity:0}to{transform:rotate(-6deg) scale(1);opacity:1}}
+
+/* chat demo: the one memorable thing */
+.chat{background:rgba(10,14,40,.72);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.chat-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);font-weight:700;font-size:.95rem}
+.dot{width:9px;height:9px;border-radius:50%;background:#6fe3a0;box-shadow:0 0 10px #6fe3a0}
+.chat-top small{color:var(--steel);font-weight:400;margin-left:auto}
+.msgs{padding:18px;min-height:330px;display:flex;flex-direction:column;gap:10px;font-size:.92rem}
+.m{max-width:86%;padding:10px 14px;border-radius:16px;animation:pop .3s ease both}
+.m.u{align-self:flex-end;background:var(--indigo);border-bottom-right-radius:4px}
+.m.b{align-self:flex-start;background:rgba(154,166,214,.14);border-bottom-left-radius:4px}
+.m code{font-family:ui-monospace,Menlo,monospace;color:var(--sakura)}
+.typing{align-self:flex-start;display:flex;gap:4px;padding:12px 14px;background:rgba(154,166,214,.14);border-radius:16px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--steel);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+
+/* sections */
+section{padding:70px 0;border-top:1px solid var(--line)}
+h2{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:28px}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.about p{color:var(--steel);max-width:60ch}
+.about p+p{margin-top:14px}
+.about strong{color:var(--moon)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.tags span{padding:6px 14px;border:1px solid var(--line);border-radius:999px;font-size:.88rem;color:var(--steel)}
+
+.builds{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{padding:26px;border:1px solid var(--line);border-radius:16px;background:rgba(26,35,88,.28);transition:transform .25s,border-color .25s;transform-style:preserve-3d}
+.card:hover{border-color:var(--sakura)}
+.card .ico{font-size:1.8rem;margin-bottom:12px}
+.card h3{font-family:'Shippori Mincho B1',serif;font-size:1.25rem;margin-bottom:8px}
+.card p{color:var(--steel);font-size:.95rem}
+
+.demo{display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between;padding:32px;border:1px dashed var(--sakura);border-radius:20px}
+.demo p{color:var(--steel);max-width:48ch;margin-top:6px}
+
+.links{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.link{display:block;padding:22px;border:1px solid var(--line);border-radius:16px;text-decoration:none;transition:transform .2s,background .2s,border-color .2s}
+.link:hover{transform:translateY(-4px);background:rgba(255,154,184,.08);border-color:var(--sakura)}
+.link small{color:var(--steel);display:block}
+.link b{font-size:1.1rem}
+footer{padding:40px 0 60px;text-align:center;color:var(--steel);font-size:.9rem;border-top:1px solid var(--line)}
+
+@media(max-width:860px){
+  .hero,.about{grid-template-columns:1fr}
+  .builds,.links{grid-template-columns:1fr}
+  nav ul{gap:14px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<canvas id="petals" aria-hidden="true"></canvas>
+
+<header class="wrap">
+  <nav>
+    <a class="logo" href="#top">Ronin<span>.</span></a>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#builds">Builds</a></li>
+      <li><a href="#bots">Bots</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <div class="hanko" aria-hidden="true">浪</div>
+      <h1>Vibe coder and prompt engineer who ships Telegram bots.</h1>
+      <p class="lead">I turn ideas into working Python scripts and bots: trading analysis, media downloaders and more. Talk to a bot and see.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://t.me/SN_Telegram_bots_Stores/214" target="_blank" rel="noopener">See my bots</a>
+        <a class="btn" href="https://t.me/Known_Samurai" target="_blank" rel="noopener">Message me on Telegram</a>
+      </div>
+    </div>
+
+    <div class="chat" role="img" aria-label="Animated demo of a Telegram bot conversation">
+      <div class="chat-top"><span class="dot"></span>Ronin’s bots<small>online</small></div>
+      <div class="msgs" id="msgs"></div>
+    </div>
+  </div>
+
+  <section id="about">
+    <h2>About me</h2>
+    <div class="about">
+      <div>
+        <p>I’m a <strong>vibe coder</strong> and <strong>prompt engineer</strong>. I describe what I want clearly, guide AI to build it, then test and fix it until it runs for real people.</p>
+        <p>Most of my work is Python scripts and Telegram bots. More projects and details are coming soon.</p>
+      </div>
+      <div>
+        <div class="tags">
+          <span>Python</span><span>Telegram bots</span><span>Prompt engineering</span><span>yt-dlp</span><span>ffmpeg</span><span>Automation</span><span>Market analysis</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="builds">
+    <h2>What I’ve built</h2>
+    <div class="builds">
+      <article class="card">
+        <div class="ico">📈</div>
+        <h3>Trading analysis bot</h3>
+        <p>Analyzes the market and sends chart screenshots straight to Telegram.</p>
+      </article>
+      <article class="card">
+        <div class="ico">🎬</div>
+        <h3>All-in-one media downloader</h3>
+        <p>One script downloads music, Instagram reels, YouTube videos and TikTok reels, using ffmpeg and yt-dlp.</p>
+      </article>
+      <article class="card">
+        <div class="ico">🤖</div>
+        <h3>Telegram bots</h3>
+        <p>Bots made for real chats. Browse the collection in my bot store channel.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="bots">
+    <h2>Bot demos</h2>
+    <div class="demo">
+      <div>
+        <h3 style="font-family:'Shippori Mincho B1',serif;font-size:1.4rem">Try the bots on Telegram</h3>
+        <p>My bot store channel lists the bots I’ve created, with links to open each one.</p>
+      </div>
+      <a class="btn primary" href="https://t.me/SN_Telegram_bots_Stores/214" target="_blank" rel="noopener">Open bot store</a>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Find me online</h2>
+    <div class="links">
+      <a class="link" href="https://github.com/Roninopp" target="_blank" rel="noopener"><small>GitHub</small><b>Roninopp</b></a>
+      <a class="link" href="https://t.me/Known_Samurai" target="_blank" rel="noopener"><small>Telegram</small><b>@Known_Samurai</b></a>
+      <a class="link" href="https://instagram.com/vivek_.vishwakrama" target="_blank" rel="noopener"><small>Instagram</small><b>@vivek_.vishwakrama</b></a>
+    </div>
+  </section>
+</main>
+
+<footer>© <span id="yr"></span> Ronin. Built with Python and good vibes.</footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* chat demo */
+const box=document.getElementById('msgs');
+const script=[
+ ['u','/download https://youtu.be/…'],
+ ['b','Got it. Fetching with <code>yt-dlp</code> and merging with <code>ffmpeg</code>…'],
+ ['b','Done ✅ Your video is ready.'],
+ ['u','/analyze BTC'],
+ ['b','📈 Market analysis ready. Sending chart screenshot…'],
+ ['b','Trend: watch the key level. Chart attached.']
+];
+const wait=ms=>new Promise(r=>setTimeout(r,reduce?0:ms));
+function add(t,h){const d=document.createElement('div');d.className='m '+t;d.innerHTML=h;box.appendChild(d);return d}
+async function play(){
+  for(;;){
+    box.innerHTML='';
+    for(const [t,h] of script){
+      if(t==='b'){
+        const ty=document.createElement('div');ty.className='typing';ty.innerHTML='<i></i><i></i><i></i>';box.appendChild(ty);
+        await wait(900);ty.remove();
+      } else await wait(700);
+      add(t,h);
+      if(reduce)continue;
+    }
+    if(reduce)return;
+    await wait(3500);
+  }
+}
+play();
+
+/* card tilt */
+document.querySelectorAll('.card').forEach(c=>{
+  if(reduce)return;
+  c.addEventListener('mousemove',e=>{
+    const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    c.style.transform=`perspective(700px) rotateY(${x*8}deg) rotateX(${-y*8}deg) translateY(-4px)`;
+  });
+  c.addEventListener('mouseleave',()=>c.style.transform='');
+});
+
+/* sakura petals */
+(function(){
+  if(reduce)return;
+  const cv=document.getElementById('petals'),cx=cv.getContext('2d');
+  let W,H,ps=[];
+  function size(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+  size();addEventListener('resize',size);
+  const N=innerWidth<700?18:34;
+  for(let i=0;i<N;i++)ps.push(mk(true));
+  function mk(init){return{x:Math.random()*W,y:init?Math.random()*H:-20,r:4+Math.random()*6,s:.4+Math.random()*.9,d:Math.random()*Math.PI*2,a:.25+Math.random()*.4}}
+  function tick(){
+    cx.clearRect(0,0,W,H);
+    for(const p of ps){
+      p.y+=p.s;p.d+=.02;p.x+=Math.sin(p.d)*.6;
+      if(p.y>H+20){Object.assign(p,mk(false));p.x=Math.random()*W}
+      cx.save();cx.translate(p.x,p.y);cx.rotate(p.d);cx.globalAlpha=p.a;cx.fillStyle='#ff9ab8';
+      cx.beginPath();cx.ellipse(0,0,p.r,p.r*.55,0,0,Math.PI*2);cx.fill();cx.restore();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
